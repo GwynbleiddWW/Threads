@@ -1,43 +1,31 @@
 package ru.netology;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainTwo {
     public static void main(String[] args) throws Exception {
 
+        Callable<Integer> callableOne = new MyCallable();
+        Callable<Integer> callableTwo = new MyCallable();
+        Callable<Integer> callableThree = new MyCallable();
+        Callable<Integer> callableFour = new MyCallable();
+        Callable<Integer> callableFive = new MyCallable();
+
         ExecutorService executor = Executors.newFixedThreadPool(4);
 
-        //
-        Callable<String> stringCallable = new MyCallable();
-        Callable<String> stringCallable2 = new MyCallable();
-        Callable<String> stringCallable3 = new MyCallable();
-        Callable<String> stringCallable4 = new MyCallable();
+        System.out.println("Number of messages: " + executor.submit(callableOne).get());
 
+        List<Callable<Integer>> callables = Arrays.asList(callableOne, callableTwo,
+                callableThree, callableFour, callableFive);
 
-        /*for (int i = 0; i < 4; i++) {
-            Thread.sleep(3000);
-            Future<String> future = executor.submit(stringCallable);
-            futures.add(future);
-        }*/
+        System.out.println("All:");
+        executor.invokeAll(callables);
+        System.out.println("Fasted: " + executor.invokeAny(callables));
 
-        List<Callable<String>> callables = List.of(stringCallable, stringCallable2, stringCallable3, stringCallable4);
-
-        String result = executor.invokeAny(callables);
-        executor.invokeAll(callables)
-                .stream()
-                .map(future -> {
-                    try {
-                        return future.get();
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
-                    }
-                })
-                .forEach(System.out::println);
-        //System.out.println("Fast: " + result);
         executor.shutdown();
     }
 }
